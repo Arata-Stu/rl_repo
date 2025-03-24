@@ -23,8 +23,15 @@ checkpoint:
   base_dir: "./ckpts/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
   topk: 3
 
-tensorboard:
-  log_dir: "./logs/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+logger:
+  type: "wandb"    # "tensorboard" または "wandb" を選択
+
+  wandb:
+    project: "VAE"
+    group: ${..vae.name}_${..dataset.name}
+  
+  tensorboard:
+    log_dir: "./logs/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
 
 hydra:
   run:

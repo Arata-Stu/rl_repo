@@ -56,17 +56,19 @@ class LoggerWrapper:
     def __init__(self, config, latent_dim, input_shape_str):
         self.logger_type = config.logger.type.lower()
         if self.logger_type == "tensorboard":
-            log_dir = os.path.join(config.tensorboard.log_dir, f"vae_latent_{latent_dim}_shape_{input_shape_str}")
+            # 新しい構造に合わせて config.logger.tensorboard.log_dir を参照
+            log_dir = os.path.join(config.logger.tensorboard.log_dir, f"vae_latent_{latent_dim}_shape_{input_shape_str}")
             os.makedirs(log_dir, exist_ok=True)
             self.writer = SummaryWriter(log_dir=log_dir)
             print(f"TensorBoard log directory: {log_dir}")
         elif self.logger_type == "wandb":
+            # wandb 用の project/group は config.logger.wandb 以下に定義
             wandb.init(
-                project=config.logger.project,
-                group=config.logger.group,
+                project=config.logger.wandb.project,
+                group=config.logger.wandb.group,
                 config=OmegaConf.to_container(config, resolve=True)
             )
-            print(f"wandb initialized with project: {config.logger.project}, group: {config.logger.group}")
+            print(f"wandb initialized with project: {config.logger.wandb.project}, group: {config.logger.wandb.group}")
         else:
             raise ValueError(f"Unsupported logger type: {self.logger_type}")
     
@@ -139,7 +141,7 @@ def main(config: DictConfig):
     print("---------------------------")
 
     latent_dim = config.vae.latent_dim
-    # ここでは vae 内の input_shape を利用
+    # vae の input_shape を利用
     input_shape = tuple(config.vae.input_shape)
     lr = config.lr
     num_epochs = config.num_epochs

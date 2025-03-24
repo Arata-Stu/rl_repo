@@ -54,21 +54,22 @@ class LoggerWrapper:
     config.logger.type に "tensorboard" または "wandb" を指定してください。
     """
     def __init__(self, config, latent_dim, input_shape_str):
-        self.logger_type = config.logger.type.lower()
+        logger_cfg = config.logger
+        self.logger_type = logger_cfg.type.lower()
         if self.logger_type == "tensorboard":
             # 新しい構造に合わせて config.logger.tensorboard.log_dir を参照
-            log_dir = os.path.join(config.logger.tensorboard.log_dir, f"vae_latent_{latent_dim}_shape_{input_shape_str}")
+            log_dir = os.path.join(logger_cfg.tensorboard.log_dir, f"vae_latent_{latent_dim}_shape_{input_shape_str}")
             os.makedirs(log_dir, exist_ok=True)
             self.writer = SummaryWriter(log_dir=log_dir)
             print(f"TensorBoard log directory: {log_dir}")
         elif self.logger_type == "wandb":
             # wandb 用の project/group は config.logger.wandb 以下に定義
             wandb.init(
-                project=config.logger.wandb.project,
-                group=config.logger.wandb.group,
+                project=logger_cfg.wandb.project,
+                group=logger_cfg.wandb.group,
                 config=OmegaConf.to_container(config, resolve=True)
             )
-            print(f"wandb initialized with project: {config.logger.wandb.project}, group: {config.logger.wandb.group}")
+            print(f"wandb initialized with project: {logger_cfg.wandb.project}, group: {logger_cfg.wandb.group}")
         else:
             raise ValueError(f"Unsupported logger type: {self.logger_type}")
     

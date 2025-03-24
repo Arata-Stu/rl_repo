@@ -4,6 +4,7 @@ vae:
   name: cnn_vae
   ckpt_path: null
 
+## train設定
 lr: 1e-4
 batch_size: 64
 num_epochs: 300
@@ -16,6 +17,7 @@ dataset:
   width: ${vae.input_shape[2]}
   height: ${vae.input_shape[1]}
   batch_size: ${batch_size}
+  num_workers: ${num_workers}
   
 checkpoint:
   base_dir: "./ckpts/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"

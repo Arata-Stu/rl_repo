@@ -2,8 +2,7 @@ vae:
   latent_dim: 64
   input_shape: [3, 64, 64]
   name: cnn_vae
-  cnn:
-    ckpt_path: null
+  ckpt_path: null
 
 lr: 1e-4
 batch_size: 64

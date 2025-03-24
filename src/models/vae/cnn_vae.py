@@ -9,7 +9,7 @@ from src.utils.timers import CudaTimer as Timer
 from .base import BaseVAE
 
 class CNN_VAE(BaseVAE):
-    def __init__(self, cnn_cfg: DictConfig, latent_dim: int, input_shape: Tuple[int, int, int] = (3, 64, 64)):
+    def __init__(self, vae_cfg: DictConfig, latent_dim: int, input_shape: Tuple[int, int, int] = (3, 64, 64)):
         super().__init__(latent_dim, input_shape)
         
         # Encoder
@@ -29,8 +29,8 @@ class CNN_VAE(BaseVAE):
         self.dec_conv3 = nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1)
         self.dec_conv4 = nn.ConvTranspose2d(32, input_shape[0], kernel_size=4, stride=2, padding=1)
 
-        if cnn_cfg.ckpt_path:
-            self.load_weights(path=cnn_cfg.ckpt_path)
+        if vae_cfg.ckpt_path:
+            self.load_weights(path=vae_cfg.ckpt_path)
 
     def encode(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         with Timer(device=x.device, timer_name="VAE: encode"):

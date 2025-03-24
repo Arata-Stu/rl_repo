@@ -95,16 +95,16 @@ class LoggerWrapper:
 def train_epoch(model, train_loader, optimizer, device, epoch):
     model.train()
     train_loss = 0
-    pbar = tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch {epoch} [Train]")
-    for batch_idx, data in pbar:
-        data = data.to(device)
-        optimizer.zero_grad()
-        recon, mu, logvar = model(data)
-        loss, bce, kl = model.vae_loss(recon, data, mu, logvar)
-        loss.backward()
-        optimizer.step()
-        train_loss += loss.item()
-        pbar.set_postfix(loss=f"{loss.item():.4f}")
+    with tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch {epoch} [Train]") as pbar:
+        for batch_idx, data in pbar:
+            data = data.to(device)
+            optimizer.zero_grad()
+            recon, mu, logvar = model(data)
+            loss, bce, kl = model.vae_loss(recon, data, mu, logvar)
+            loss.backward()
+            optimizer.step()
+            train_loss += loss.item()
+            # 必要に応じて pbar.set_postfix(loss=f"{loss.item():.4f}") を使えます
     avg_loss = train_loss / len(train_loader.dataset)
     print(f"====> Epoch {epoch} Train Average loss: {avg_loss:.4f}")
     return avg_loss
@@ -113,13 +113,13 @@ def evaluate_epoch(model, val_loader, device, epoch, logger):
     model.eval()
     val_loss = 0
     with torch.no_grad():
-        pbar = tqdm(enumerate(val_loader), total=len(val_loader), desc=f"Epoch {epoch} [Val]")
-        for batch_idx, data in pbar:
-            data = data.to(device)
-            recon, mu, logvar = model(data)
-            loss, bce, kl = model.vae_loss(recon, data, mu, logvar)
-            val_loss += loss.item()
-            pbar.set_postfix(loss=f"{loss.item():.4f}")
+        with tqdm(enumerate(val_loader), total=len(val_loader), desc=f"Epoch {epoch} [Val]") as pbar:
+            for batch_idx, data in pbar:
+                data = data.to(device)
+                recon, mu, logvar = model(data)
+                loss, bce, kl = model.vae_loss(recon, data, mu, logvar)
+                val_loss += loss.item()
+                pbar.set_postfix(loss=f"{loss.item():.4f}")
     avg_val_loss = val_loss / len(val_loader.dataset)
     print(f"====> Epoch {epoch} Validation Average loss: {avg_val_loss:.4f}")
 
@@ -132,6 +132,7 @@ def evaluate_epoch(model, val_loader, device, epoch, logger):
     logger.add_image("Comparison (Original | Reconstructed)", grid_combined, epoch)
     
     return avg_val_loss
+
 
 @hydra.main(config_path="config", config_name="train_vae", version_base="1.2")
 def main(config: DictConfig):

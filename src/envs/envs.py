@@ -6,7 +6,7 @@ from src.envs.car_racing import CarRacingWithInfoWrapper
 
 def get_env(env_cfg: DictConfig) -> gym.Env:
     """環境を取得する"""
-    env = gym.make(env_cfg.name)
+    env = gym.make(env_cfg.name, render_mode=env_cfg.render_mode)
     env = TimeLimit(env, max_episode_steps=env_cfg.num_steps)
 
     if env_cfg.name == "CarRacing-v3":

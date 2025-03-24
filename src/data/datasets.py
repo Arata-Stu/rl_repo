@@ -35,10 +35,10 @@ def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
     elif dataset_cfg.name == 'coco':
         # COCOデータセットの場合
         if mode == "train":
-            data_root = os.path.join(dataset_cfg.root, "train2017")
+            data_root = os.path.join(dataset_cfg.root, "images", "train2017")
             ann_file = os.path.join(dataset_cfg.root, "annotations", "instances_train2017.json")
         elif mode == "val":
-            data_root = os.path.join(dataset_cfg.root, "val2017")
+            data_root = os.path.join(dataset_cfg.root, "images", "val2017")
             ann_file = os.path.join(dataset_cfg.root, "annotations", "instances_val2017.json")
         else:
             data_root = dataset_cfg.root

@@ -28,7 +28,7 @@ logger:
 
   wandb:
     project: "VAE"
-    group: ${..vae.name}_${..dataset.name}
+    group: ${...vae.name}_${...dataset.name}
   
   tensorboard:
     log_dir: "./logs/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"

@@ -1,0 +1,29 @@
+vae:
+  latent_dim: 64
+  input_shape: [3, 64, 64]
+  cnn:
+    ckpt_path: null
+
+lr: 1e-4
+batch_size: 64
+num_epochs: 300
+num_workers: 16
+input_shape: ${vae.input_shape}
+
+dataset:
+  name: "coco"    # "coco" または "cifar10" を指定
+  root: "./data/coco"  # coco の画像ディレクトリ
+  width: ${vae.input_shape[2]}
+  height: ${vae.input_shape[1]}
+  batch_size: ${batch_size}
+  
+checkpoint:
+  base_dir: "./ckpts/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+  topk: 3
+
+tensorboard:
+  log_dir: "./logs/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+
+hydra:
+  run:
+    dir: ./outputs/train_vae/${now:%Y-%m-%d}/${now:%H-%M-%S}

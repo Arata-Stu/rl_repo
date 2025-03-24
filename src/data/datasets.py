@@ -1,0 +1,45 @@
+import os
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from omegaconf import DictConfig
+
+from src.data.img_dataset import ConcatFrameDataset
+
+def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
+    """データローダーを取得する"""
+
+    # 前処理の定義
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.RandomRotation(degrees=10),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.Resize((dataset_cfg.height, dataset_cfg.width)),
+    ])
+    
+    if dataset_cfg.name == 'img':
+        # modeに応じて対象のディレクトリを指定する
+        if mode == "train":
+            data_root = os.path.join(dataset_cfg.root, "train")
+        elif mode == "val":
+            data_root = os.path.join(dataset_cfg.root, "val")
+        else:
+            data_root = dataset_cfg.root
+        
+        dataset = ConcatFrameDataset(
+            root=data_root,
+            transform=transform,
+        )
+    else:
+        raise NotImplementedError(f"Dataset {dataset_cfg.name} is not implemented")
+
+    # DataLoaderの作成
+    dataloader = DataLoader(
+        dataset,
+        batch_size=dataset_cfg.batch_size,
+        shuffle=(mode == "train"),
+        num_workers=dataset_cfg.num_workers,
+        pin_memory=True,
+    )
+    
+    return dataloader

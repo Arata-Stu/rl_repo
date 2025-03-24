@@ -1,0 +1,15 @@
+env:
+  name: CarRacing-v3
+  render_mode : human
+  num_steps: 1000
+  width: 96 # default 96
+  height: 96 # default 96
+
+num_episodes: 10
+num_steps: 1000
+output_dir: ???
+mode: manual # manual or random
+
+hydra:
+  run:
+    dir: ./outputs/collect_data/${now:%Y-%m-%d}/${now:%H-%M-%S}

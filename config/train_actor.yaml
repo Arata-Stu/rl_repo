@@ -1,0 +1,22 @@
+max_episodes: 1000
+max_steps: 1000
+reconstructed_log_interval: 100
+batch_size: 128
+save_ckpt_dir: "./outputs/train_actor/${now:%Y-%m-%d}/${now:%H-%M-%S}/ckpt"
+
+eval_interval: 10
+num_eval_episodes: 1
+record_video: True
+
+vae:
+  latent_dim: 64
+  input_shape: [3, 64, 64]
+  cnn:
+    ckpt_path: null
+  
+tensorboard:
+  log_dir: "./logs/RL/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+
+hydra:
+  run:
+    dir: ./outputs/train_actor/${now:%Y-%m-%d}/${now:%H-%M-%S}

@@ -12,11 +12,11 @@ def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
 
     # 前処理の定義
     transform = transforms.Compose([
-        transforms.ToTensor(),
         transforms.RandomRotation(degrees=10),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
         transforms.Resize((dataset_cfg.height, dataset_cfg.width)),
+        transforms.ToTensor(),
     ])
     
     if dataset_cfg.name == 'img':

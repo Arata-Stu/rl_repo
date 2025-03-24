@@ -66,8 +66,8 @@ def main(config: DictConfig):
     optimizer = optim.Adam(vae.parameters(), lr=lr)
 
     # 学習データローダーと評価（検証）データローダーを取得
-    train_loader = get_dataloader(config.dataset, split="train")
-    val_loader = get_dataloader(config.dataset, split="val")
+    train_loader = get_dataloader(config.dataset, mode="train")
+    val_loader = get_dataloader(config.dataset, mode="val")
 
     # CheckpointManager と TensorBoard の初期化
     checkpoint_manager = CheckpointManager(checkpoint_dir, config.checkpoint.topk)

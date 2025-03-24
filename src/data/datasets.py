@@ -4,6 +4,8 @@ from torchvision import transforms
 from omegaconf import DictConfig
 
 from src.data.img_dataset import ConcatFrameDataset
+from src.data.coco_dataset import CocoImageDataset
+
 
 def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
     """データローダーを取得する"""
@@ -28,6 +30,23 @@ def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
         
         dataset = ConcatFrameDataset(
             root=data_root,
+            transform=transform,
+        )
+    elif dataset_cfg.name == 'coco':
+        # COCOデータセットの場合
+        if mode == "train":
+            data_root = os.path.join(dataset_cfg.root, "train2017")
+            ann_file = os.path.join(dataset_cfg.root, "annotations", "instances_train2017.json")
+        elif mode == "val":
+            data_root = os.path.join(dataset_cfg.root, "val2017")
+            ann_file = os.path.join(dataset_cfg.root, "annotations", "instances_val2017.json")
+        else:
+            data_root = dataset_cfg.root
+            ann_file = os.path.join(dataset_cfg.root, "annotations", "instances_test2017.json")
+        
+        dataset = CocoImageDataset(
+            root=data_root,
+            annFile=ann_file,
             transform=transform,
         )
     else:

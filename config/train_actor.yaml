@@ -14,8 +14,9 @@ vae:
   cnn:
     ckpt_path: null
   
-tensorboard:
-  log_dir: "./logs/RL/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+logger:
+  tensorboard:
+    log_dir: "./logs/RL/${now:%Y-%m-%d}/${now:%H-%M-%S}"
 
 hydra:
   run:

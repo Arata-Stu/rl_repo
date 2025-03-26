@@ -10,6 +10,9 @@ from torch.utils.tensorboard import SummaryWriter
 
 from src.models.vae.vae import get_vae
 from src.data.datasets import get_dataloader  
+import os
+import torch
+import wandb
 
 class CheckpointManager:
     """
@@ -31,37 +34,52 @@ class CheckpointManager:
         print(f"Last checkpoint saved: {last_ckpt_path}")
 
         # 評価損失を名前に含めた保存ファイル名
-        filename = f"vae_epoch{epoch}_val{loss:.4f}.pth"
-        filepath = os.path.join(self.base_dir, filename)
-        torch.save(model.state_dict(), filepath)
-        print(f"Checkpoint saved: {filepath}")
+        raw_filename = f"vae_epoch{epoch}_val{loss:.4f}.pth"
+        raw_filepath = os.path.join(self.base_dir, raw_filename)
+        torch.save(model.state_dict(), raw_filepath)
+        print(f"Checkpoint saved: {raw_filepath}")
 
         # wandb アップロード処理
         if self.logger_type == "wandb":
             artifact = wandb.Artifact(f"model_checkpoint_epoch_{epoch}", type="model")
-            artifact.add_file(filepath)
-            artifact.add_file(last_ckpt_path)  # last.ckpt も一緒にアップロード
+            artifact.add_file(raw_filepath)
+            artifact.add_file(last_ckpt_path)
             wandb.log_artifact(artifact)
             print(f"Checkpoint artifact logged to wandb for epoch {epoch}")
 
-        # topk の管理
-        self.checkpoints.append((loss, filepath))
-        self.checkpoints.sort(key=lambda x: x[0])
+        # topk の更新と整理
+        self.checkpoints.append((loss, raw_filepath))
+        self.checkpoints.sort(key=lambda x: x[0])  # 小さい順に並び替え
+        self._rename_topk_checkpoints()
 
-        # topkに含まれるものには _topk をファイル名に追加（オプション）
-        for idx, (l, path) in enumerate(self.checkpoints[:self.topk]):
-            base, ext = os.path.splitext(path)
-            topk_path = base + "_topk" + ext
-            if not os.path.exists(topk_path):
-                os.rename(path, topk_path)
-                self.checkpoints[idx] = (l, topk_path)
+    def _rename_topk_checkpoints(self):
+        # topkのファイルを _top{rank} 付きに整理
+        new_checkpoints = []
+        for idx, (loss, old_path) in enumerate(self.checkpoints[:self.topk]):
+            new_filename = f"vae_epoch*_val{loss:.4f}_top{idx+1}.pth"
 
-        # topk を超えた分は削除
-        if len(self.checkpoints) > self.topk:
-            worst_loss, worst_path = self.checkpoints.pop()
-            if os.path.exists(worst_path):
-                os.remove(worst_path)
-                print(f"Removed old checkpoint: {worst_path}")
+            # 元のファイル名から epoch を抽出（正規表現で抽出しても可）
+            basename = os.path.basename(old_path)
+            parts = basename.split("_")
+            epoch_part = next((p for p in parts if p.startswith("epoch")), "epochUnknown")
+            new_filename = f"vae_{epoch_part}_val{loss:.4f}_top{idx+1}.pth"
+            new_path = os.path.join(self.base_dir, new_filename)
+
+            # リネーム処理
+            if old_path != new_path:
+                if os.path.exists(new_path):
+                    os.remove(new_path)
+                os.rename(old_path, new_path)
+                print(f"Renamed {old_path} -> {new_path}")
+            new_checkpoints.append((loss, new_path))
+
+        # topk外を削除
+        for loss, path in self.checkpoints[self.topk:]:
+            if os.path.exists(path):
+                os.remove(path)
+                print(f"Removed old checkpoint: {path}")
+
+        self.checkpoints = new_checkpoints
 
 
 class LoggerWrapper:

@@ -20,7 +20,7 @@ dataset:
   num_workers: ${num_workers}
   
 checkpoint:
-  base_dir: "./ckpts/VAE/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+  base_dir: "./ckpts/VAE/${../dataset.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}"
   topk: 3
 
 logger:

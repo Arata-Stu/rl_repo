@@ -35,4 +35,4 @@ logger:
 
 hydra:
   run:
-    dir: ./outputs/train_vae/${..dataset.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./outputs/train_vae/${...dataset.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}

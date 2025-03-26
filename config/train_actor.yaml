@@ -8,10 +8,35 @@ eval_interval: 10
 num_eval_episodes: 1
 record_video: True
 
+env:
+  name: CarRacing-v3
+  render_mode : rgb_array
+  num_steps: 1000
+  width: 64 # default 96
+  height: 64 # default 96
+
 vae:
   latent_dim: 64
   input_shape: [3, 64, 64]
+  name: cnn_vae
   ckpt_path: ???
+
+agent:
+  name: TD3-HUG
+  actor_lr: 1e-4
+  critic_lr: 1e-4
+  gamma: 0.99
+  tau: 0.005
+  hidden_dim: 128
+  policy_noise: 0.2
+  noise_clip: 0.5
+  policy_delay: 2
+  intervention_weight: 1.0
+  ckpt_path: null
+
+buffer: 
+  name: off_policy_HUG
+  size: 1e6
   
 logger:
   tensorboard:

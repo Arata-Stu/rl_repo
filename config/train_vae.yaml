@@ -31,7 +31,7 @@ logger:
     group: ${...vae.name}_${...dataset.name}
   
   tensorboard:
-    log_dir: "./logs/VAE/${..dataset.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}"
+    log_dir: "./logs/VAE/${...dataset.name}/${now:%Y-%m-%d}/${now:%H-%M-%S}"
 
 hydra:
   run:

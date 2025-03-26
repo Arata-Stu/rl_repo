@@ -1,6 +1,7 @@
 import os
 import glob
 import h5py
+import hdf5plugin
 from torch.utils.data import Dataset
 
 class FrameDataset(Dataset):

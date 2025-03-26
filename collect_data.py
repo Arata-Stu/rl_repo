@@ -3,11 +3,12 @@ import numpy as np
 import hydra
 import pygame
 import h5py  
+import hdf5plugin
 from omegaconf import DictConfig, OmegaConf
 
 from src.envs.envs import get_env
 from src.utils.timers import Timer as Timer
-
+from src.utils.preprocessing import _blosc_opts
 @hydra.main(config_path="config", config_name="collect_data", version_base="1.2")
 def main(config: DictConfig):
     OmegaConf.to_container(config, resolve=True, throw_on_missing=True)
@@ -91,10 +92,10 @@ def main(config: DictConfig):
         episode_frames = np.stack(episode_frames, axis=0)
         episode_h5_path = os.path.join(save_dir, f"ep{episode_count:03d}.h5")
         
-        # HDF5ファイルに保存（gzip圧縮を利用）
+                # Blosc圧縮を使って保存
         with h5py.File(episode_h5_path, "w") as hf:
-            hf.create_dataset("frames", data=episode_frames, compression="gzip")
-        
+            hf.create_dataset("frames", data=episode_frames, **_blosc_opts())
+
         episode_count += 1
 
     env.close()

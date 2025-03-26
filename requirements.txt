@@ -3,6 +3,7 @@ omegaconf
 tqdm
 numpy
 h5py
+hdf5plugin
 torch
 torchvision
 opencv-python

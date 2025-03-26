@@ -32,7 +32,12 @@ def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
         NotImplementedError(f"mode {mode} is not implemented")
 
     if dataset_cfg.name == 'img':
-        # modeに応じて対象のディレクトリを指定する
+        # ToPILImage を transform の先頭に追加
+        transform = transforms.Compose([
+            transforms.ToPILImage(),  # ← ここが重要！
+            *transform.transforms
+        ])
+
         if mode == "train":
             data_root = os.path.join(dataset_cfg.root, "train")
         elif mode == "val":

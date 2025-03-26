@@ -25,7 +25,7 @@ logger.type=tensorboard
 
 ### 3. train_actor
 ```shell
-SHAPE="[3, 64, 64]"
+SHAPE=[3,64,64]
 LATENT=64
 python3 train_actor.py \
 vae.input_shape=${SHAPE} \

@@ -89,7 +89,7 @@ class Trainer:
                     with Timer("Buffer Add"):
                         done = terminated or truncated
                         next_state_vec = torch.tensor(next_obs_vec, dtype=torch.float32).unsqueeze(0).to(self.device)
-                        self.buffer.add(state, state_vec, action, reward, next_state, next_state_vec, done)
+                        self.buffer.add(state_vec, state, action, action, 0.0, reward, next_state_vec, next_state, done)
 
                     episode_reward += reward
 

@@ -11,14 +11,26 @@ def get_dataloader(dataset_cfg: DictConfig, mode: str = "train") -> DataLoader:
     """データローダーを取得する"""
 
     # 前処理の定義
-    transform = transforms.Compose([
+    train_transform = transforms.Compose([
         transforms.RandomRotation(degrees=10),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
         transforms.Resize((dataset_cfg.height, dataset_cfg.width)),
         transforms.ToTensor(),
     ])
-    
+
+    val_transform = transforms.Compose([
+        transforms.Resize((dataset_cfg.height, dataset_cfg.width)),
+        transforms.ToTensor(),
+    ])
+
+    if mode == "train":
+        transform = train_transform
+    elif mode == "val":  
+        transform = val_transform
+    else:
+        NotImplementedError(f"mode {mode} is not implemented")
+
     if dataset_cfg.name == 'img':
         # modeに応じて対象のディレクトリを指定する
         if mode == "train":

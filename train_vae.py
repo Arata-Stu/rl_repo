@@ -25,28 +25,44 @@ class CheckpointManager:
         self.logger_type = logger_type
 
     def update(self, epoch, loss, model):
-        filename = f"vae_epoch{epoch}.pth"
+        # last.ckpt の保存（常に上書き）
+        last_ckpt_path = os.path.join(self.base_dir, "last.ckpt")
+        torch.save(model.state_dict(), last_ckpt_path)
+        print(f"Last checkpoint saved: {last_ckpt_path}")
+
+        # 評価損失を名前に含めた保存ファイル名
+        filename = f"vae_epoch{epoch}_val{loss:.4f}.pth"
         filepath = os.path.join(self.base_dir, filename)
-        # チェックポイントの保存
         torch.save(model.state_dict(), filepath)
         print(f"Checkpoint saved: {filepath}")
-        
-        # wandb を利用している場合はアーティファクトとしてアップロード
+
+        # wandb アップロード処理
         if self.logger_type == "wandb":
             artifact = wandb.Artifact(f"model_checkpoint_epoch_{epoch}", type="model")
             artifact.add_file(filepath)
+            artifact.add_file(last_ckpt_path)  # last.ckpt も一緒にアップロード
             wandb.log_artifact(artifact)
             print(f"Checkpoint artifact logged to wandb for epoch {epoch}")
-        
-        # チェックポイントリストに追加してソート
+
+        # topk の管理
         self.checkpoints.append((loss, filepath))
         self.checkpoints.sort(key=lambda x: x[0])
-        # topk を超える場合は、最も損失が高いチェックポイントを削除
+
+        # topkに含まれるものには _topk をファイル名に追加（オプション）
+        for idx, (l, path) in enumerate(self.checkpoints[:self.topk]):
+            base, ext = os.path.splitext(path)
+            topk_path = base + "_topk" + ext
+            if not os.path.exists(topk_path):
+                os.rename(path, topk_path)
+                self.checkpoints[idx] = (l, topk_path)
+
+        # topk を超えた分は削除
         if len(self.checkpoints) > self.topk:
             worst_loss, worst_path = self.checkpoints.pop()
             if os.path.exists(worst_path):
                 os.remove(worst_path)
                 print(f"Removed old checkpoint: {worst_path}")
+
 
 class LoggerWrapper:
     """

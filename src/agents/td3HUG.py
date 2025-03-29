@@ -84,15 +84,16 @@ class TD3HUG(BaseAgent):
 
         # リプレイバッファからサンプリング
         sample = buffer.sample(batch_size)
-        state_vec = torch.FloatTensor(sample[0]).to(self.device)
-        state_z = torch.FloatTensor(sample[1]).to(self.device)
-        action = torch.FloatTensor(sample[2]).to(self.device)
-        human_action = torch.FloatTensor(sample[3]).to(self.device)
-        intervention = torch.FloatTensor(sample[4]).to(self.device)  # 介入フラグ：0または1
-        reward = torch.FloatTensor(sample[5]).to(self.device)
-        next_state_vec = torch.FloatTensor(sample[6]).to(self.device)
-        next_state_z = torch.FloatTensor(sample[7]).to(self.device)
-        not_done = torch.FloatTensor(sample[8]).to(self.device)
+        state_z = torch.FloatTensor(sample["state_z"]).to(self.device)
+        state_vec = torch.FloatTensor(sample["state_vec"]).to(self.device)
+        action = torch.FloatTensor(sample["action"]).to(self.device)
+        reward = torch.FloatTensor(sample["reward"]).to(self.device)
+        next_state_z = torch.FloatTensor(sample["next_state_z"]).to(self.device)
+        next_state_vec = torch.FloatTensor(sample["next_state_vec"]).to(self.device)
+        done = torch.FloatTensor(sample["done"]).to(self.device)
+        human_action = torch.FloatTensor(sample["human_action"]).to(self.device)
+        intervention = torch.FloatTensor(sample["intervention"]).to(self.device)  # 介入フラグ：0または1
+
 
         # 状態は元の状態ベクトルと潜在表現を結合
         state = torch.cat([state_vec, state_z], dim=-1)
@@ -108,7 +109,7 @@ class TD3HUG(BaseAgent):
             next_action = torch.clamp(self.actor_target(next_state) + noise, -1, 1)
             target_q1, target_q2 = self.critic_target(next_state, next_action)
             target_q = torch.min(target_q1, target_q2)
-            target_q = reward + not_done * self.gamma * target_q
+            target_q = reward + (1 - done) * self.gamma * target_q
         
         # 現在のQ値の計算とCriticの損失
         current_q1, current_q2 = self.critic(state, action)

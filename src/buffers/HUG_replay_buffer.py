@@ -71,17 +71,18 @@ class HugReplayBuffer(ReplayBufferBase):
             batch_size (int): サンプリングするバッチサイズ
 
         Returns:
-            tuple: (state_vecs, state_zs, actions, human_actions, interventions, rewards, next_state_vecs, next_state_zs, not_done)
+            dict: 各項目をキーとする辞書形式
         """
         indices = np.random.randint(0, self.size, size=batch_size)
-        return (
-            self.state_vec[indices],
-            self.state_z[indices],
-            self.action[indices],
-            self.human_action[indices],
-            self.intervention[indices],
-            self.reward[indices],
-            self.next_state_vec[indices],
-            self.next_state_z[indices],
-            self.not_done[indices]
-        )
+        return {
+            "state_vec": self.state_vec[indices],
+            "state_z": self.state_z[indices],
+            "action": self.action[indices],
+            "human_action": self.human_action[indices],
+            "intervention": self.intervention[indices],
+            "reward": self.reward[indices],
+            "next_state_vec": self.next_state_vec[indices],
+            "next_state_z": self.next_state_z[indices],
+            "done": 1.0 - self.not_done[indices]  # ←SACに合わせて「done」に変更してもOK
+        }
+

@@ -12,7 +12,7 @@ def evaluate_agent(config: DictConfig):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # 環境の初期化
-    env = get_env(env_cfg=config.env)
+    env = get_env(env_cfg=config.envs)
     
     # エージェント、バッファ、VAEの初期化
     state_z_dim = config.vae.latent_dim

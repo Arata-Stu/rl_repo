@@ -23,7 +23,7 @@ class Trainer:
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         # 環境の初期化
-        self.env = get_env(env_cfg=config.env)
+        self.env = get_env(env_cfg=config.envs)
         
 
         # エージェント、バッファ、VAEの初期化

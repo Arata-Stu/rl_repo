@@ -1,0 +1,5 @@
+name: CarRacing-v3
+render_mode : rgb_array
+num_steps: 1000
+width: 64 # default 96
+height: 64 # default 96

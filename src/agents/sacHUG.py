@@ -7,7 +7,7 @@ from src.models.actor.actor import ActorSAC
 from src.models.critic.critic import Critic
 from .base import BaseAgent
 
-class SACAgent(BaseAgent):
+class SACHUG(BaseAgent):
     def __init__(self,
                  state_z_dim: int,
                  state_vec_dim: int,

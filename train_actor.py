@@ -31,7 +31,7 @@ class Trainer:
         state_vec_dim = 4
         action_dim = 3
         self.agent = get_agents(agent_cfg=config.agent, state_z_dim=state_z_dim, state_vec_dim=state_vec_dim, action_dim=action_dim)
-        self.buffer = HugReplayBuffer(max_size=config.buffer.max_size, state_vec_dim=state_vec_dim, state_z_dim=state_z_dim, action_dim=action_dim)
+        self.buffer = HugReplayBuffer(max_size=int(config.buffer.size), state_vec_dim=state_vec_dim, state_z_dim=state_z_dim, action_dim=action_dim)
         self.vae = get_vae(vae_cfg=config.vae).to(self.device).eval()
 
         # TensorBoardの初期化
@@ -205,7 +205,7 @@ class Trainer:
             video_tensor = video_tensor.unsqueeze(0)
             self.writer.add_video("Actor/Evaluation/Run", video_tensor, current_episode, fps=60)
 
-@hydra.main(config_path='config', config_name='train', version_base='1.2')
+@hydra.main(config_path='config', config_name='train_actor', version_base='1.2')
 def main(config: DictConfig):
     trainer = Trainer(config)
     trainer.train()

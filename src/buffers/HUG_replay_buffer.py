@@ -1,6 +1,10 @@
 import numpy as np
+import torch
+from typing import Union
 
-class HugReplayBuffer:
+from .base import ReplayBufferBase
+
+class HugReplayBuffer(ReplayBufferBase):
     def __init__(self, max_size, state_vec_dim, state_z_dim, action_dim):
         """
         Args:
@@ -45,14 +49,14 @@ class HugReplayBuffer:
             next_state_z (np.array): 次の状態の潜在空間情報
             done (bool): エピソード終了フラグ
         """
-        self.state_vec[self.ptr] = state_vec
-        self.state_z[self.ptr] = state_z
-        self.action[self.ptr] = action
-        self.human_action[self.ptr] = human_action
-        self.intervention[self.ptr] = intervention
-        self.reward[self.ptr] = reward
-        self.next_state_vec[self.ptr] = next_state_vec
-        self.next_state_z[self.ptr] = next_state_z
+        self.state_vec[self.ptr] = self._to_numpy(state_vec)
+        self.state_z[self.ptr] = self._to_numpy(state_z)
+        self.action[self.ptr] = self._to_numpy(action)
+        self.human_action[self.ptr] = self._to_numpy(human_action)
+        self.intervention[self.ptr] = self._to_numpy(intervention)
+        self.reward[self.ptr] = self._to_numpy(reward)
+        self.next_state_vec[self.ptr] = self._to_numpy(next_state_vec)
+        self.next_state_z[self.ptr] = self._to_numpy(next_state_z)
         self.not_done[self.ptr] = 1.0 - float(done)
         
         # リングバッファ方式で古いデータを上書き

@@ -1,28 +1,33 @@
-envs:
-  name: CarRacing-v3
-  render_mode : human
-  num_steps: 1000
-  width: 64 # default 96
-  height: 64 # default 96
+defaults:
+  - envs: car_racing
+  - vae: cnn
+  - agent: ???
 
-vae:
-  latent_dim: 64
-  input_shape: [3, 64, 64]
-  name: cnn_vae
-  ckpt_path: ???
+# envs:
+#   name: CarRacing-v3
+#   render_mode : human
+#   num_steps: 1000
+#   width: 64 # default 96
+#   height: 64 # default 96
 
-agent:
-  name: TD3-HUG
-  actor_lr: 1e-4
-  critic_lr: 1e-4
-  gamma: 0.99
-  tau: 0.005
-  hidden_dim: 128
-  policy_noise: 0.2
-  noise_clip: 0.5
-  policy_delay: 2
-  intervention_weight: 1.0
-  ckpt_path: ???
+# vae:
+#   latent_dim: 64
+#   input_shape: [3, 64, 64]
+#   name: cnn_vae
+#   ckpt_path: ???
+
+# agent:
+#   name: TD3-HUG
+#   actor_lr: 1e-4
+#   critic_lr: 1e-4
+#   gamma: 0.99
+#   tau: 0.005
+#   hidden_dim: 128
+#   policy_noise: 0.2
+#   noise_clip: 0.5
+#   policy_delay: 2
+#   intervention_weight: 1.0
+#   ckpt_path: ???
 
 hydra:
   run:
